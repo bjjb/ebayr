@@ -36,9 +36,18 @@ module Ebayr
     !!sandbox
   end
 
+  def self.uri_prefix
+    "https://api#{sandbox ? ".sandbox" : ""}.ebay.com/ws"
+  end
+
   # Gets the URI used for calls
   def self.uri
-    URI::parse("https://api#{sandbox ? ".sandbox" : ""}.ebay.com/ws/api.dll")
+    URI::parse("#{uri_prefix}/api.dll")
+  end
+
+  def self.authorization_uri(session_id, ru_params = {})
+    ruparams = CGI::escape(ru_params.map { |k, v| "#{k}=#{v}" }.join("&"))
+    URI::parse("#{uri_prefix}/eBayISAPI.dll?SignIn&RuName=%s&SessId=#{session_id}&ruparams=#{ruparams}")
   end
 
   def self.xml(structure)
