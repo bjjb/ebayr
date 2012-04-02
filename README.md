@@ -24,7 +24,7 @@ http://developer.ebay.com if you haven't already done so.
 
 Next, you'll need to require Ebayr, and tell it to use your keys. You will also
 need to generate an RUName, and get the key for that. (This is all standard
-stuff - look at the eBay developer docs for details).
+stuff - look at the [eBay developer docs][1] for details).
 
 ```ruby
 require 'ebayr'
@@ -76,11 +76,37 @@ config/initializers/ebayr.rb (or something), and put the configuration there. Of
 course, you should probably not check in these files, if you're using a public
 repository.
 
+## Testing
+
+When running test, you generally won't want to use up your API call-limit too
+quickly, so it makes sense to stub out calls to the eBay API.
+
+Ebayr has a small test helper library to help with this. It uses [Fakeweb][2]
+for this, and just requires that you wrap your test code in a block, like this:
+
+```ruby
+require 'ebayr/test_helper'
+class MyTest < Test::Unit::TestCase
+  include Ebayr::TestHelper
+
+  # A very contrived example...
+  def test_fetching_user_id
+    stub_ebay_call!(:GetUser, :UserID => "joebloggs") do
+      assert_equal("joebloggs", Ebayr.call(:GetUser)['UserID'])
+    end
+  end
+end
+```
+
+You need to remember to include Fakeweb in your Gemfile, or Ebayr will complain.
+
 ## Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-
 5. Create new Pull Request
+
+[1]: http://developer.ebay.com
+[2]: http://fakeweb.rubyforge.org
