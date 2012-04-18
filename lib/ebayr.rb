@@ -36,20 +36,33 @@ module Ebayr
     !!sandbox
   end
 
-  def self.uri_prefix
-    "https://api#{sandbox ? ".sandbox" : ""}.ebay.com/ws"
+  # Gets either ebay.com/ws or sandbox.ebay.com/ws, as appropriate, with
+  # "service" prepended. E.g.
+  #
+  #     Ebayr.uri_prefix("blah")  # => https://blah.ebay.com/ws
+  #     Ebayr.uri_prefix          # => https://api.ebay.com/ws
+  def self.uri_prefix(service = "api")
+    "https://#{service}#{sandbox ? ".sandbox" : ""}.ebay.com/ws"
   end
 
-  # Gets the URI used for calls
-  def self.uri
-    URI::parse("#{uri_prefix}/api.dll")
+  # Gets the URI used for API calls (as a URI object)
+  def self.uri(*args)
+    URI::parse("#{uri_prefix(*args)}/api.dll")
   end
 
+  # Gets the URI for eBay authorization/login. The session_id should be obtained
+  # via an API call to GetSessionID (be sure to use the right ru_name), and the
+  # ru_params can contain anything (they will be passed back to your app in the
+  # redirect from eBay upon successful login and authorization).
   def self.authorization_uri(session_id, ru_params = {})
     ruparams = CGI::escape(ru_params.map { |k, v| "#{k}=#{v}" }.join("&"))
-    URI::parse("#{uri_prefix}/eBayISAPI.dll?SignIn&RuName=%s&SessId=#{session_id}&ruparams=#{ruparams}")
+    URI::parse("#{uri_prefix("signin")}/eBayISAPI.dll?SignIn&RuName=#{ru_name}&SessId=#{session_id}&ruparams=#{ruparams}")
   end
 
+  # A very, very simple XML serializer.
+  #
+  #     Ebayr.xml("Hello!")       # => "Hello!"
+  #     Ebayr.xml({:foo=>"Bar"})  # => <foo>Bar</foo>
   def self.xml(structure)
     case structure
       when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join

@@ -21,7 +21,9 @@ class TestEbayr < Test::Unit::TestCase
     assert Ebayr.sandbox?
   end
 
-  def test_ebayr_uri
+  def test_ebayr_uris
+    assert_equal "https://api.sandbox.ebay.com/ws", Ebayr.uri_prefix
+    assert_equal "https://blah.sandbox.ebay.com/ws", Ebayr.uri_prefix("blah")
     assert_equal "https://api.sandbox.ebay.com/ws/api.dll", Ebayr.uri.to_s
   end
 end
