@@ -27,11 +27,10 @@ module Ebayr
           #{content}
         </#{call}Response>
       XML
-      FakeWeb.register_uri( :any, Ebayr.uri, :body => body)
+      FakeWeb.register_uri(:any, Ebayr.uri, :body => body)
       yield
       FakeWeb.clean_registry
       FakeWeb.allow_net_connect = _allow_net_connect_
     end
-
   end
 end
