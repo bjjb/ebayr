@@ -1,11 +1,11 @@
 # -*- encoding : utf-8 -*-
-require "ebayr/version"
 require 'net/https'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/hash/conversions'
 require 'active_support/buffered_logger'
 
 module Ebayr
+  autoload :User, 'ebayr/user'
   mattr_accessor :dev_id,
                  :app_id,
                  :cert_id,
@@ -91,6 +91,7 @@ module Ebayr
     auth_token = arguments.delete(:auth_token) || self.auth_token.to_s
     site_id = arguments.delete(:site_id) || self.site_id.to_s
     compatability_level = arguments.delete(:compatability_level) || self.compatability_level.to_s
+    arguments = process_args(arguments)
 
     headers = {
       'X-EBAY-API-COMPATIBILITY-LEVEL' => compatability_level.to_s,
@@ -160,11 +161,15 @@ module Ebayr
     end
   end
 
-  # Shorthand for call(call, arguments.merge(:auth_token => this.ebay_token))
-  # Allows objects which mix in this module to use their own token.
-  def ebay_call(call, arguments = {})
-    raise "#{self} has no eBay token" unless ebay_token
-    Ebay.call(call, arguments.merge(:auth_token => ebay_token))
+  def self.process_args(args)
+    result = {}
+    args.each do |k, v|
+      result[k] = case v
+        when Date, Time then v.to_time.utc.iso8601
+        else v
+      end
+    end
+    result
   end
 
   class Exception < ::Exception

@@ -26,4 +26,15 @@ class TestEbayr < Test::Unit::TestCase
     assert_equal "https://blah.sandbox.ebay.com/ws", Ebayr.uri_prefix("blah")
     assert_equal "https://api.sandbox.ebay.com/ws/api.dll", Ebayr.uri.to_s
   end
+
+  def test_times_are_converted
+    original = {
+      :time => Time.now,
+      :date => Date.today,
+      :string => "Hello"
+    }
+    converted = Ebayr.process_args(original)
+    assert_equal original[:time].utc.iso8601, converted[:time]
+    assert_equal original[:date].to_time.utc.iso8601, converted[:date]
+  end
 end
