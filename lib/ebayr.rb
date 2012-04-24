@@ -18,10 +18,12 @@ module Ebayr
                  :compatability_level,
                  :logger
 
-  @@logger ||= if defined?(Rails) 
-    Rails.logger
-  else
-    ActiveSupport::BufferedLogger.new(STDOUT) 
+  def self.logger
+    @logger ||=  if defined?(Rails) 
+      Rails.logger
+    else
+      ActiveSupport::BufferedLogger.new(STDOUT) 
+    end
   end
 
   %W(/etc/ebayrc.conf /usr/local/etc/ebayrc.conf ~/.ebayrc.conf ./.ebayrc.conf).each do |path|
@@ -147,13 +149,10 @@ module Ebayr
         raise Exception.new("No #{call}Response in response", request, response)
       end
       case result['Ack']
-      when 'Success'
-        return result
-      when 'Warning'
-        @@logger.warn(result['Errors'].inspect)
-        return result
-      else
-        raise Error.new(result['Errors'], request, response)
+        when 'Success' # OK
+        when 'Warning', 'PartialFailure' then logger.warn(result['Errors'].inspect)
+        when 'Failure' then logger.error(result['Errors'].inspect)
+        else logger.fatal("Unknown Ack: #{result['Ack']}")
       end
       return result
     else
@@ -165,7 +164,7 @@ module Ebayr
     result = {}
     args.each do |k, v|
       result[k] = case v
-        when Date, Time then v.to_time.utc.iso8601
+        when Time then v.to_time.utc.iso8601
         else v
       end
     end
