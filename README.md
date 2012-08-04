@@ -29,34 +29,35 @@ stuff - look at the [eBay developer docs][1] for details).
 ```ruby
 require 'ebayr'
 
-Ebay.dev_id = "my-dev-id"
+Ebayr.dev_id = "my-dev-id"
 
 # This is only needed if you want to retrieve user tokens
-Ebay.authorization_callback_url = "https://my-site/callback-url"
+Ebayr.authorization_callback_url = "https://my-site/callback-url"
 
-Ebay.auth_token = "myverylongebayauthtoken"
+Ebayr.auth_token = "myverylongebayauthtoken"
 
-Ebay.app_id = "my-ebay-app-id"
+Ebayr.app_id = "my-ebay-app-id"
 
-Ebay.cert_id = "my-ebay-cert-id"
+Ebayr.cert_id = "my-ebay-cert-id"
 
-Ebay.ru_name = "my-ebay-ru-name"
+Ebayr.ru_name = "my-ebay-ru-name"
 
 # Set this to true for testing in the eBay Sandbox (but remember to use the
 # appropriate keys!). It's true by default.
-Ebay.sandbox = false
+Ebayr.sandbox = false
 ```
 
 Now you're ready to make calls
-
 ```ruby
 Ebayr.call(:GeteBayOfficialTime)
+session = Ebayr.call(:GetSessionID, :RuName => Ebayr.ru_name)[:SessionID]
 ```
 
 To use an authorized user's key, pass in an `auth_token` parameter
 ```ruby
 Ebayr.call(:GetOrders, :auth_token => "another-ebay-auth-token")
 ```
+
 
 ### Configuration
 
