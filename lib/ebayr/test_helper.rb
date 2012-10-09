@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Ebayr
   module TestHelper
     @@success = Ebayr.xml(:Ack => "Success")
@@ -17,7 +18,13 @@ module Ebayr
     #       assert Ebayr.call(:GeteBayOfficialTime) # => stubbed call
     #     end
     #   end
+    #
+    # This method is deprecated, and will be removed in a future release.
     def stub_ebay_call!(call, content, &block)
+      puts <<DEPRECATION
+stub_ebay_call! is deprecated, and will be removed in a future release. Please
+use Ruby techniques to stub eBay calls your way. See the wiki for details.
+DEPRECATION
       content = Ebayr.xml(content) unless content.is_a?(String)
       _allow_net_connect_ = FakeWeb.allow_net_connect?
       FakeWeb.allow_net_connect = false

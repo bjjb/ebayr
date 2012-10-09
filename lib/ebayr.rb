@@ -1,41 +1,75 @@
 # -*- encoding : utf-8 -*-
+require 'logger'
 require 'net/https'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/hash/conversions'
-require 'active_support/buffered_logger'
 
+# A library to assist in using the eBay Trading API.
 module Ebayr
-  autoload :User, 'ebayr/user'
-  mattr_accessor :dev_id,
-                 :app_id,
-                 :cert_id,
-                 :ru_name,
-                 :auth_token,
-                 :sandbox,
-                 :authorization_callback_url,
-                 :callbacks,
-                 :site_id,
-                 :compatability_level,
-                 :logger
+  autoload :Request,  File.expand_path('../ebayr/request',  __FILE__)
+  autoload :Response, File.expand_path('../ebayr/response', __FILE__)
+  autoload :User,     File.expand_path('../ebayr/user',     __FILE__)
 
-  def self.logger
-    @logger ||=  if defined?(Rails) 
-      Rails.logger
-    else
-      ActiveSupport::BufferedLogger.new(STDOUT) 
-    end
+  # To make a call, you need to have a registered user and app. Then you must
+  # fill in the <code>dev_id</code>, <code>app_id</code>, <code>cert_id</code>
+  # and <code>ru_name</code>. You will also need an <code>auth_token</code>,
+  # though you may use any user's token here.
+  # See http://developer.ebay.com/DevZone/XML/docs/HowTo/index.html for more
+  # details.
+  mattr_accessor :dev_id
+  mattr_accessor :app_id
+  mattr_accessor :cert_id
+  mattr_accessor :ru_name
+  mattr_accessor :auth_token
+
+  # Determines whether to use the eBay sandbox or the real site.
+  mattr_accessor :sandbox
+  self.sandbox = true
+
+  def sandbox?
+    !!sandbox
   end
 
+  # This URL is used to redirect the user back after a successful registration.
+  # For more details, see here:
+  # http://developer.ebay.com/DevZone/XML/docs/WebHelp/wwhelp/wwhimpl/js/html/wwhelp.htm?context=eBay_XML_API&topic=GettingATokenViaFetchToken
+  mattr_accessor :authorization_callback_url
+  self.authorization_callback_url = 'https://example.com/'
+
+  # This URL is used if the authorization process fails - usually because the user
+  # didn't click 'I agree'. If you leave it nil, the
+  # <code>authorization_callback_url</code> will be used (but the parameters will be
+  # different).
+  mattr_accessor :authorization_failure_url
+  self.authorization_failure_url = nil
+
+  # Callbacks which are invoked at various points throughout a request.
+  mattr_accessor :callbacks
+  self.callbacks = {
+    :before_request   => [],
+    :after_request    => [],
+    :before_response  => [],
+    :after_response   => [],
+    :on_error         => []
+  }
+
+  # The eBay Site to use for calls. The full list of available sites can be
+  # retrieved with <code>GeteBayDetails(:DetailName => "SiteDetails")</code>
+  mattr_accessor :site_id
+  self.site_id = 0
+
+  # eBay Trading API version to use. For more details, see
+  # http://developer.ebay.com/devzone/xml/docs/HowTo/eBayWS/eBaySchemaVersioning.html
+  mattr_accessor :compatability_level
+  self.compatability_level = 745
+
+  mattr_accessor :logger
+  self.logger = Logger.new(STDOUT)
+  self.logger.level = Logger::INFO
+
+  # Override defaults with values from a config file, if there is one.
   %W(/etc/ebayrc.conf /usr/local/etc/ebayrc.conf ~/.ebayrc.conf ./.ebayrc.conf).each do |path|
     load path if File.exists?(path = File.expand_path(path))
-  end
-
-
-  @@site_id             ||= 0   # US
-  @@compatability_level ||= 745
-
-  def self.sandbox?
-    !!sandbox
   end
 
   # Gets either ebay.com/ws or sandbox.ebay.com/ws, as appropriate, with
@@ -43,12 +77,12 @@ module Ebayr
   #
   #     Ebayr.uri_prefix("blah")  # => https://blah.ebay.com/ws
   #     Ebayr.uri_prefix          # => https://api.ebay.com/ws
-  def self.uri_prefix(service = "api")
+  def uri_prefix(service = "api")
     "https://#{service}#{sandbox ? ".sandbox" : ""}.ebay.com/ws"
   end
 
   # Gets the URI used for API calls (as a URI object)
-  def self.uri(*args)
+  def uri(*args)
     URI::parse("#{uri_prefix(*args)}/api.dll")
   end
 
@@ -56,24 +90,12 @@ module Ebayr
   # via an API call to GetSessionID (be sure to use the right ru_name), and the
   # ru_params can contain anything (they will be passed back to your app in the
   # redirect from eBay upon successful login and authorization).
-  def self.authorization_uri(session_id, ru_params = {})
+  def authorization_uri(session_id, ru_params = {})
     ruparams = CGI::escape(ru_params.map { |k, v| "#{k}=#{v}" }.join("&"))
     URI::parse("#{uri_prefix("signin")}/eBayISAPI.dll?SignIn&RuName=#{ru_name}&SessId=#{session_id}&ruparams=#{ruparams}")
   end
 
-  # A very, very simple XML serializer.
-  #
-  #     Ebayr.xml("Hello!")       # => "Hello!"
-  #     Ebayr.xml({:foo=>"Bar"})  # => <foo>Bar</foo>
-  def self.xml(structure)
-    case structure
-      when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-      when Array then structure.map { |v| xml(v) }
-      else structure.to_s
-    end
-  end
-
-  # Make an eBay call (symbol or string). You can pass in these arguments:
+  # Perform an eBay call (symbol or string). You can pass in these arguments:
   #
   # auth_token:: to use a user's token instead of the general token
   # site_id:: to use a specific eBay site (default is 0, which is US ebay.com)
@@ -81,113 +103,32 @@ module Ebayr
   #
   # All other arguments are passed into the API call, and may be nested.
   #
-  # Remember, case matters.
+  #     response = call(:GeteBayOfficialTime)
+  #     response = call(:get_ebay_official_time)
   #
-  #     call(:GeteBayOfficialTime)
+  # See Ebayr::Request for details.
   #
-  # The response is a Hash of the response, deserialized from the XML by
-  # ActiveSupport's XML deserializer.
-  def self.call(call, arguments = {})
-    call = call.to_s
-
-    auth_token = arguments.delete(:auth_token) || self.auth_token.to_s
-    site_id = arguments.delete(:site_id) || self.site_id.to_s
-    compatability_level = arguments.delete(:compatability_level) || self.compatability_level.to_s
-    arguments = process_args(arguments)
-
-    headers = {
-      'X-EBAY-API-COMPATIBILITY-LEVEL' => compatability_level.to_s,
-      'X-EBAY-API-DEV-NAME' => dev_id.to_s,
-      'X-EBAY-API-APP-NAME' => app_id.to_s,
-      'X-EBAY-API-CERT-NAME' => cert_id.to_s,
-      'X-EBAY-API-CALL-NAME' => call.to_s,
-      'X-EBAY-API-SITEID' => site_id.to_s,
-      'Content-Type' => 'text/xml'
-    }
-
-    xml = xml(arguments)
-
-    xml = <<-XML
-      <?xml version="1.0" encoding="utf-8"?>
-      <#{call}Request xmlns="urn:ebay:apis:eBLBaseComponents">
-        <RequesterCredentials>
-          <eBayAuthToken>#{auth_token}</eBayAuthToken>
-        </RequesterCredentials>
-        #{xml}
-      </#{call}Request>
-    XML
-
-    request = Net::HTTP::Post.new(uri.path, headers)
-
-    request.body = xml.to_s
-
-    http = Net::HTTP.new(uri.host, uri.port)
-
-    if uri.port == 443
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
-
-    response = http.start { |http| http.request(request) }
-
-    if callbacks
-      callbacks.each do |callback|
-        if callback.is_a?(Symbol)
-          send(callback, request, response)
-        elsif callback.respond_to?(:call)
-          callback.call(request, response)
-        else
-          throw Error.new("Invalid callback: #{callback.to_s}")
-        end
-      end
-    end
-
-    case response
-    when Net::HTTPSuccess 
-      result = Hash.from_xml(response.body)["#{call}Response"]
-      unless result
-        raise Exception.new("No #{call}Response in response", request, response)
-      end
-      case result['Ack']
-        when 'Success' # OK
-        when 'Warning', 'PartialFailure' then logger.warn(result['Errors'].inspect)
-        when 'Failure' then logger.error(result['Errors'].inspect)
-        else logger.fatal("Unknown Ack: #{result['Ack']}")
-      end
-      return result
-    else
-      raise Exception.new("Unexpected response from server", request, response)
-    end
+  # The response is a special Hash of the response, deserialized from the XML
+  #
+  #     response.timestamp     # => 2010-10-10 10:00:00 UTC
+  #     response[:timestamp]   # => 2010-10-10 10:00:00 UTC
+  #     response['Timestamp']  # => "2012-10-10T10:00:00.000Z"
+  #     response[:Timestamp]   # => "2012-10-10T10:00:00.000Z"
+  #     response.ack           # "Success"
+  #     response.success?      # true
+  #
+  #  See Ebayr::Response for details.
+  #
+  #  To see a list of available calls, check out
+  #  http://developer.ebay.com/DevZone/XML/docs/Reference/ebay/index.html
+  def call(call, arguments = {})
+    Request.new(call, arguments).send
   end
 
-  def self.process_args(args)
-    result = {}
-    args.each do |k, v|
-      result[k] = case v
-        when Time then v.to_time.utc.iso8601
-        else v
-      end
-    end
-    result
+
+  def self.included(mod)
+    mod.extend(self)
   end
 
-  class Exception < ::Exception
-    attr_reader :request, :response
-    def initialize(message, request, response)
-      super message
-      @request, @response = request, response
-    end
-  end
-
-  class Error < Exception
-    attr_reader :request, :response, :errors
-    def initialize(errors, request, response)
-      @errors, @request, @response = errors, request, response
-      super
-    end
-    
-    def to_s
-      [@errors].flatten.map { |e| "<#{e['LongMessage']}>" }.join(", ")
-    end
-  end
+  extend self
 end

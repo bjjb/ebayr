@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Ebayr
   module User
     # Shorthand for call(call, arguments.merge(:auth_token => this.ebay_token))
