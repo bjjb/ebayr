@@ -1,13 +1,15 @@
 # -*- encoding : utf-8 -*-
 module Ebayr #:nodoc:
   # Encapsulates a request which is sent to the eBay Trading API.
-  class Request < Net::HTTP::Post
+  class Request
     include Ebayr
+
+    attr_reader :command
 
     # Make a new call. The URI used will be that of Ebayr::uri, unless
     # overridden here (same for auth_token, site_id and compatability_level).
-    def initialize(call, options = {})
-      @call = self.class.camelize(call.to_s)
+    def initialize(command, options = {})
+      @command = self.class.camelize(command.to_s)
       @uri = options.delete(:uri) || self.uri
       @uri = URI.parse(@uri) unless @uri.is_a? URI
       @auth_token = (options.delete(:auth_token) || self.auth_token).to_s
@@ -15,7 +17,6 @@ module Ebayr #:nodoc:
       @compatability_level = (options.delete(:compatability_level) || self.compatability_level).to_s
       # Remaining options are converted and used as input to the call
       @input = self.class.serialize_input(options)
-      super(@uri.path, headers)
     end
 
     # Gets the path to which this request will be posted
@@ -27,10 +28,10 @@ module Ebayr #:nodoc:
     def headers
       {
         'X-EBAY-API-COMPATIBILITY-LEVEL' => @compatability_level.to_s,
-        'X-EBAY-API-DEV-NAME' => @dev_id.to_s,
-        'X-EBAY-API-APP-NAME' => @app_id.to_s,
-        'X-EBAY-API-CERT-NAME' => @cert_id.to_s,
-        'X-EBAY-API-CALL-NAME' => @call.to_s,
+        'X-EBAY-API-DEV-NAME' => dev_id.to_s,
+        'X-EBAY-API-APP-NAME' => app_id.to_s,
+        'X-EBAY-API-CERT-NAME' => cert_id.to_s,
+        'X-EBAY-API-CALL-NAME' => @command.to_s,
         'X-EBAY-API-SITEID' => @site_id.to_s,
         'Content-Type' => 'text/xml'
       }
@@ -40,19 +41,35 @@ module Ebayr #:nodoc:
     def body
       <<-XML
         <?xml version="1.0" encoding="utf-8"?>
-        <#{@call}Request xmlns="urn:ebay:apis:eBLBaseComponents">
+        <#{@command}Request xmlns="urn:ebay:apis:eBLBaseComponents">
           <RequesterCredentials>
             <eBayAuthToken>#{@auth_token}</eBayAuthToken>
           </RequesterCredentials>
           #{self.class.xml(@input)}
-        </#{@call}Request>
+        </#{@command}Request>
       XML
     end
 
-    # Sends this request, using its own HTTP connection.
+    # Makes a HTTP connection and sends the request, returning an
+    # Ebayr::Response
     def send
-      response = http.start { |h| h.request(self) }
+      http = Net::HTTP.new(@uri.host, @uri.port)
+
+      if @uri.port == 443
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+
+      post = Net::HTTP::Post.new(@uri.path, headers)
+      post.body = body
+
+      response = http.start { |http| http.request(post) }
+
       @response = Response.new(response, self)
+    end
+
+    def to_s
+      "#{@command}[#{@input}] <#{@uri}>"
     end
 
     # A very, very simple XML serializer.
@@ -80,22 +97,23 @@ module Ebayr #:nodoc:
       result
     end
 
-    # Converts a call like get_ebay_offical_time to GeteBayOfficialTime
+    # Converts a command like get_ebay_offical_time to GeteBayOfficialTime
     def self.camelize(string)
       string = string.to_s
       return string unless string == string.downcase
       string.split('_').map(&:capitalize).join.gsub('Ebay', 'eBay')
     end
 
-    # Gets a (cached) HTTP connection for this request.
-    def http
-      return @http if defined? @http
-      @http = Net::HTTP.new(@uri.host, @uri.port)
+    # Gets a HTTP connection for this request. If you pass in a block, it will
+    # be run on that HTTP connection.
+    def http(&block)
+      http = Net::HTTP.new(@uri.host, @uri.port)
       if @uri.port == 443
-        @http.use_ssl = true
-        @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
-      @http
+      return http.start(&block) if block_given?
+      http
     end
   end
 end

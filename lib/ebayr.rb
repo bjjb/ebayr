@@ -67,11 +67,6 @@ module Ebayr
   self.logger = Logger.new(STDOUT)
   self.logger.level = Logger::INFO
 
-  # Override defaults with values from a config file, if there is one.
-  %W(/etc/ebayrc.conf /usr/local/etc/ebayrc.conf ~/.ebayrc.conf ./.ebayrc.conf).each do |path|
-    load path if File.exists?(path = File.expand_path(path))
-  end
-
   # Gets either ebay.com/ws or sandbox.ebay.com/ws, as appropriate, with
   # "service" prepended. E.g.
   #
@@ -121,8 +116,8 @@ module Ebayr
   #
   #  To see a list of available calls, check out
   #  http://developer.ebay.com/DevZone/XML/docs/Reference/ebay/index.html
-  def call(call, arguments = {})
-    Request.new(call, arguments).send
+  def call(command, arguments = {})
+    Request.new(command, arguments).send
   end
 
 
@@ -132,3 +127,9 @@ module Ebayr
 
   extend self
 end
+
+# Override defaults with values from a config file, if there is one.
+%W(/etc/ebayr.conf /usr/local/etc/ebayr.conf ~/.ebayr.conf ./.ebayr.conf).each do |path|
+  load path if File.exists?(path = File.expand_path(path))
+end
+

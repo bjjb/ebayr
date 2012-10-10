@@ -37,7 +37,10 @@ class EbayrTest < Test::Unit::TestCase
   # If this passes without an exception, then we're ok.
   def test_basic_usage
     t = Time.now.utc
-    assert Ebayr.call(:GeteBayOfficialTime), "Failed the most basic test"
+    assert_nothing_raised "Failed the most basic test" do
+      response = Ebayr.call(:GeteBayOfficialTime)
+      assert_kind_of Ebayr::Response, response
+    end
   end
 
   def test_sandbox_reports_accurately

@@ -8,7 +8,8 @@ module Ebayr #:nodoc:
         case response
         when Net::HTTPSuccess
           data = Hash.from_xml(response.body)
-          case data['Ack']
+          result = data["#{request.command}Response"]
+          case result['Ack']
             when 'Success' then Success.new(data, request)
             when 'Failure' then Failure.new(data, request)
             when 'PartialFailure' then PartialFailure.new(data, request)
@@ -16,12 +17,13 @@ module Ebayr #:nodoc:
             else raise "Unexpected Ack (#{data['Ack']}) in response"
           end
         else
-          raise Error.new(response, request)
+          Error.new(response, request)
         end
       end
     end
 
     def initialize(data, request)
+      super(data)
       @request = request
       normalize! if Ebayr.normalize_response?
     end
@@ -38,6 +40,10 @@ module Ebayr #:nodoc:
     class Error < Exception
       def initialize(response, request)
         @response, @request = response, request
+      end
+
+      def to_s
+        "#{@request} -> #{@response.class}"
       end
     end
   end
