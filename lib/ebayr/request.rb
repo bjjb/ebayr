@@ -65,7 +65,7 @@ module Ebayr #:nodoc:
 
       response = http.start { |http| http.request(post) }
 
-      @response = Response.new(response, self)
+      @response = Response.new(self, response)
     end
 
     def to_s

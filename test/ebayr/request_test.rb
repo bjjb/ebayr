@@ -1,8 +1,7 @@
 # -*- encoding : utf-8 -*-
-require 'test/unit'
-require File.expand_path("../../../lib/ebayr", __FILE__)
+require 'test_helper'
 
-class RequestTest < Test::Unit::TestCase
+class Ebayr::RequestTest < Test::Unit::TestCase
   def test_request_is_autoloaded
     assert_nothing_raised "Failed to autoload Request! (path = #{$:})" do
       Ebayr::Request

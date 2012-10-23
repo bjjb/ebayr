@@ -1,10 +1,9 @@
 # -*- encoding : utf-8 -*-
 $:.push(File.expand_path('../lib', __FILE__)) unless $:.include?(File.expand_path('../lib', __FILE__))
-require 'ebayr/version'
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["JJ Buckley"]
-  gem.email         = ["jj@bjjb.org"]
+  gem.authors       = ["Bryan JJ Buckley"]
+  gem.email         = ["jjbuckley@gmail.org"]
   gem.description   = "A tidy library for using the eBay Trading API with Ruby"
   gem.summary       = <<-DESCRIPTION
 eBayR is a gem that makes it (relatively) easy to use the eBay Trading API from
@@ -18,8 +17,10 @@ command-line client which aids integration into other projects.
   gem.test_files    = gem.files.grep(%r{^test/})
   gem.name          = "ebayr"
   gem.require_paths = ["lib"]
-  gem.version       = Ebayr::VERSION
+  gem.version       = "0.2.0"
   gem.add_dependency 'activesupport'
+  gem.add_dependency 'hipsterhash'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'fakeweb'
+  gem.add_development_dependency 'turn'
 end

@@ -1,6 +1,5 @@
 # -*- encoding : utf-8 -*-
-require 'test/unit'
-require 'ebayr'
+require 'test_helper'
 
 class EbayrTest < Test::Unit::TestCase
   def setup
@@ -36,10 +35,12 @@ class EbayrTest < Test::Unit::TestCase
 
   # If this passes without an exception, then we're ok.
   def test_basic_usage
-    t = Time.now.utc
+    xml = "<GeteBayOfficialTimeResponse><Ack>Succes</Ack><Timestamp>blah</Timestamp></GeteBayOfficialTimeResponse>"
+    FakeWeb.register_uri(:post, Ebayr.uri, :body => xml)
     assert_nothing_raised "Failed the most basic test" do
       response = Ebayr.call(:GeteBayOfficialTime)
       assert_kind_of Ebayr::Response, response
+      assert_equal 'blah', response.timestamp
     end
   end
 
