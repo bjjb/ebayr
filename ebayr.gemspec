@@ -17,10 +17,12 @@ command-line client which aids integration into other projects.
   gem.test_files    = gem.files.grep(%r{^test/})
   gem.name          = "ebayr"
   gem.require_paths = ["lib"]
-  gem.version       = "0.2.0"
+  gem.version       = "0.0.5"
   gem.add_dependency 'activesupport'
   gem.add_dependency 'hipsterhash'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'fakeweb'
   gem.add_development_dependency 'turn'
+  gem.add_development_dependency 'guard-test'
+  gem.add_development_dependency 'spork'
 end

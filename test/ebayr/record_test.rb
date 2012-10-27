@@ -1,6 +1,7 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
-module Ebayr #:nodoc:
+
+module Ebayr
   class RecordTest < Test::Unit::TestCase
     def test_lookup_is_case_insensitive
       record = Record.new('Foo' => 'Bar')
