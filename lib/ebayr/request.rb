@@ -75,11 +75,12 @@ module Ebayr #:nodoc:
     # A very, very simple XML serializer.
     #
     #     Ebayr.xml("Hello!")       # => "Hello!"
-    #     Ebayr.xml({:foo=>"Bar"})  # => <foo>Bar</foo>
+    #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
+    #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
     def self.xml(structure)
       case structure
         when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-        when Array then structure.map { |v| xml(v) }
+        when Array then structure.map { |v| xml(v) }.join(',')
         else structure.to_s
       end
     end

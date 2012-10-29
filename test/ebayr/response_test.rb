@@ -10,20 +10,20 @@ module Ebayr
       end
     end
 
-    def test_response_has_the_data_from_the_response
+    def test_response_xml
       xml = "<GetSomethingResponse><Foo>Bar</Foo></GetSomethingResponse>"
       response = Response.new(OpenStruct.new(:command => 'GetSomething'), OpenStruct.new(:body => xml))
       assert_equal 'Bar', response['Foo']
       assert_equal 'Bar', response.foo
     end
 
-    def test_response_deals_with_ebay
+    def test_response_ebay_handling
       xml = "<GeteBayResponse><eBayFoo>Bar</eBayFoo></GeteBayResponse>"
       response = Response.new(OpenStruct.new(:command => 'GeteBay'), OpenStruct.new(:body => xml))
       assert_equal 'Bar', response.ebay_foo
     end
 
-    def test_response_can_be_nested
+    def test_response_nesting
       xml = <<-XML
         <GetOrdersResponse>
           <OrdersArray>
@@ -44,6 +44,10 @@ module Ebayr
       assert_equal "1", response.orders_array.order[0].order_id
       assert_equal "2", response.orders_array.order[1].order_id
       assert_equal "3", response.orders_array.order[2].order_id
+    end
+
+    def test_response_pagination
+
     end
   end
 end
