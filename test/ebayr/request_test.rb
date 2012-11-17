@@ -19,5 +19,28 @@ module Ebayr
       assert_equal Ebayr.uri, Request.uri
       assert_equal Ebayr.uri, Request.new(:Blah).uri
     end
+
+    def test_xml_of_a_hash
+      expected = '<a><b>123</b></a>'
+      assert_equal expected, Request.xml({ :a => { :b => 123 } })
+    end
+
+    def test_xml_of_an_array
+      expected = '<a>1</a><a>2</a>'
+      assert_equal expected, Request.xml([{ :a => 1 }, { :a => 2 }])
+    end
+
+    def test_xml_of_a_string
+      assert_equal 'boo', Request.xml('boo')
+    end
+
+    def test_xml_of_a_number
+      assert_equal '1234', Request.xml(1234)
+    end
+
+    def test_xml_of_multiple_arguments
+      assert_equal '<a>1</a><a><b>1</b><b>2</b></a>',
+        Request.xml({ :a => 1 }, { :a => [{:b => 1 }, { :b => 2 }] })
+    end
   end
 end

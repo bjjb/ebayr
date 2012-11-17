@@ -77,12 +77,14 @@ module Ebayr #:nodoc:
     #     Ebayr.xml("Hello!")       # => "Hello!"
     #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
     #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
-    def self.xml(structure)
-      case structure
-        when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-        when Array then structure.map { |v| xml(v) }.join(',')
-        else structure.to_s
-      end
+    def self.xml(*args)
+      args.map do |structure|
+        case structure
+          when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
+          when Array then structure.map { |v| xml(v) }.join
+          else structure.to_s
+        end
+      end.join
     end
 
     # Prepares a hash of arguments for input to an eBay Trading API XML call.
