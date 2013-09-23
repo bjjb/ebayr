@@ -70,7 +70,7 @@ module Ebayr
   # eBay Trading API version to use. For more details, see
   # http://developer.ebay.com/devzone/xml/docs/HowTo/eBayWS/eBaySchemaVersioning.html
   mattr_accessor :compatability_level
-  self.compatability_level = 745
+  self.compatability_level = 837
 
   mattr_accessor :logger
   self.logger = Logger.new(STDOUT)
