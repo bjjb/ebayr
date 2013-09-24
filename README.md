@@ -64,10 +64,10 @@ Ebayr.call(:GetOrders, :auth_token => "another-ebay-auth-token")
 Ebayr will look for the following Ruby files, and load them *once* in order (if
 they exist) when the module is evaluated:
 
-1. /etc/ebayrc.conf
-2. /usr/local/etc/ebayrc.conf
-3. ~/.ebayrc.conf
-4. ./.ebayrc.conf
+1. /etc/ebayr.conf
+2. /usr/local/etc/ebayr.conf
+3. ~/.ebayr.conf
+4. ./.ebayr.conf
 
 You can put configuration code in there (such as the variable setting shown
 above). The files should be plain old Ruby.
