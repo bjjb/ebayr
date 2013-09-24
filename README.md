@@ -84,22 +84,43 @@ repository.
 When running test, you generally won't want to use up your API call-limit too
 quickly, so it makes sense to stub out calls to the eBay API.
 
-Ebayr has a small test helper library to help with this. It uses [Fakeweb][2]
-for this, and just requires that you wrap your test code in a block, like this:
+Ebayr test use [Fakeweb][2] to mimic the responses from eBay.
 
 ```ruby
-require 'ebayr/test_helper'
+require 'ebayr'
+require 'test/unit'
+require 'fakeweb'
+
 class MyTest < Test::Unit::TestCase
-  include Ebayr::TestHelper
+  def setup
+    Ebayr.sandbox = true
+  end
 
   # A very contrived example...
-  def test_fetching_user_id
-    stub_ebay_call!(:GetUser, :UserID => "joebloggs") do
-      assert_equal("joebloggs", Ebayr.call(:GetUser)['UserID'])
-    end
+  def test_get_ebay_time
+    xml = <<-XML
+      <GeteBayOfficialTimeResponse>
+        <Ack>Success</Ack>
+        <Timestamp>blah</Timestamp>
+      </GeteBayOfficialTimeResponse>
+    XML
+
+    FakeWeb.register_uri(:post, Ebayr.uri, :body => xml)
+
+    time = SomeWrapperThatUsesEbayr.get_ebay_time
+    assert_equal 'blah', time
+  end
+end
+
+class SomeWrapperThatUsesEbayr
+  def self.get_ebay_time
+    hash = Ebayr.call(:GeteBayOfficialTime)
+    hash.timestamp
   end
 end
 ```
+
+See ['./test/ebayr_test.rb'](test/ebayr_test.rb) for more examples.
 
 You need to remember to include Fakeweb in your Gemfile, or Ebayr will complain.
 
