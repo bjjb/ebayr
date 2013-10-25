@@ -15,6 +15,7 @@ module Ebayr #:nodoc:
       @auth_token = (options.delete(:auth_token) || self.auth_token).to_s
       @site_id = (options.delete(:site_id) || self.site_id).to_s
       @compatability_level = (options.delete(:compatability_level) || self.compatability_level).to_s
+      @http_timeout = (options.delete(:http_timeout) || 60).to_i
       # Remaining options are converted and used as input to the call
       @input = self.class.serialize_input(options)
     end
@@ -54,6 +55,7 @@ module Ebayr #:nodoc:
     # Ebayr::Response
     def send
       http = Net::HTTP.new(@uri.host, @uri.port)
+      http.read_timeout = @http_timeout
 
       if @uri.port == 443
         http.use_ssl = true
