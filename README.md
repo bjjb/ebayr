@@ -79,6 +79,8 @@ repository.
 
 ## Testing
 
+[![Status](https://travis-ci.org/bjjb/itunes.png?branch=master)](https://travis-ci.org/bjjb/itunes)
+
 When running test, you generally won't want to use up your API call-limit too
 quickly, so it makes sense to stub out calls to the eBay API.
 
