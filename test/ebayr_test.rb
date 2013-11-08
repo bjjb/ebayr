@@ -1,10 +1,10 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
+require 'ebayr'
+require 'fakeweb'
 
-class EbayrTest < Test::Unit::TestCase
-  def setup
-    Ebayr.sandbox = true
-  end
+describe Ebayr do
+  before { Ebayr.sandbox = true }
 
   def check_common_methods(mod = Ebayr)
     assert_respond_to mod, :"dev_id"
@@ -34,55 +34,54 @@ class EbayrTest < Test::Unit::TestCase
   end
 
   # If this passes without an exception, then we're ok.
-  def test_basic_usage
-    xml = "<GeteBayOfficialTimeResponse><Ack>Succes</Ack><Timestamp>blah</Timestamp></GeteBayOfficialTimeResponse>"
-    FakeWeb.register_uri(:post, Ebayr.uri, :body => xml)
-    assert_nothing_raised "Failed the most basic test" do
-      response = Ebayr.call(:GeteBayOfficialTime)
-      assert_kind_of Ebayr::Response, response
-      assert_equal 'blah', response.timestamp
+  describe "basic usage" do
+    before { FakeWeb.register_uri(:post, Ebayr.uri, :body => xml) }
+    let(:xml) { "<GeteBayOfficialTimeResponse><Ack>Succes</Ack><Timestamp>blah</Timestamp></GeteBayOfficialTimeResponse>" }
+
+    it "runs without exceptions" do
+      Ebayr.call(:GeteBayOfficialTime).timestamp.must_equal 'blah'
     end
   end
 
-  def test_sandbox_reports_accurately
+  it "correctly reports its sandbox status" do
     Ebayr.sandbox = false
-    assert !Ebayr.sandbox?, "Ebayr::sandbox can't be set to false"
+    Ebayr.wont_be :sandbox?
     Ebayr.sandbox = true
-    assert Ebayr.sandbox?, "Ebayr::sandbox can't be set to true"
+    Ebayr.must_be :sandbox?
   end
 
-  def test_ebayr_sandbox_uris
-    assert Ebayr.sandbox, "Tests should run in the sandbox"
-    assert_equal "https://api.sandbox.ebay.com/ws", Ebayr.uri_prefix, "Basic URI prefix is wrong"
-    assert_equal "https://blah.sandbox.ebay.com/ws", Ebayr.uri_prefix("blah"), "Special URI prefix is wrong"
-    assert_equal "https://api.sandbox.ebay.com/ws/api.dll", Ebayr.uri.to_s, "Basic URI is wrong"
+  it "has the right sandbox URIs" do
+    Ebayr.must_be :sandbox?
+    Ebayr.uri_prefix.must_equal "https://api.sandbox.ebay.com/ws"
+    Ebayr.uri_prefix("blah").must_equal "https://blah.sandbox.ebay.com/ws"
+    Ebayr.uri.to_s.must_equal "https://api.sandbox.ebay.com/ws/api.dll"
   end
 
-  def test_ebayr_uris
+  it "has the right real-world URIs" do
     Ebayr.sandbox = false
-    assert_equal "https://api.ebay.com/ws", Ebayr.uri_prefix, "Basic URI prefix is wrong"
-    assert_equal "https://blah.ebay.com/ws", Ebayr.uri_prefix("blah"), "Special URI prefix is wrong"
-    assert_equal "https://api.ebay.com/ws/api.dll", Ebayr.uri.to_s, "Basic URI is wrong"
+    Ebayr.uri_prefix.must_equal "https://api.ebay.com/ws"
+    Ebayr.uri_prefix("blah").must_equal "https://blah.ebay.com/ws"
+    Ebayr.uri.to_s.must_equal "https://api.ebay.com/ws/api.dll"
     Ebayr.sandbox = true
   end
 
-  def test_extension_by_another_module
+  it "works when as an extension" do
     mod = Module.new { extend Ebayr }
     check_common_methods(mod)
   end
 
-  def test_inclusion_in_another_module
+  it "works as an inclusion" do
     mod = Module.new { extend Ebayr }
     check_common_methods(mod)
   end
 
-  def test_common_methods
+  it "has the right methods" do
     check_common_methods
   end
 
-  def test_defaults
-    assert Ebayr.sandbox
-    assert_equal "https://api.sandbox.ebay.com/ws/api.dll", Ebayr.uri.to_s
-    assert_kind_of Logger, Ebayr.logger
+  it "has decent defaults" do
+    Ebayr.must_be :sandbox?
+    Ebayr.uri.to_s.must_equal "https://api.sandbox.ebay.com/ws/api.dll"
+    Ebayr.logger.must_be_kind_of Logger
   end
 end

@@ -1,8 +1,9 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
+require 'ebayr/record'
 
 module Ebayr
-  class RecordTest < Test::Unit::TestCase
+  class RecordTest < MiniTest::Unit::TestCase
     def test_lookup_is_case_insensitive
       record = Record.new('Foo' => 'Bar')
       assert_equal 'Bar', record['Foo']
