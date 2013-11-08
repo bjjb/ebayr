@@ -25,6 +25,10 @@ module Ebayr
       super(key, value)
     end
 
+    def has_key?(key)
+      super(convert_key(key))
+    end
+
   protected
     def convert_key(k)
       self.class.convert_key(k)

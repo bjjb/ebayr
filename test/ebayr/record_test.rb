@@ -17,5 +17,16 @@ module Ebayr
       assert_equal 1, record.foo.bars[0].value
       assert_equal 2, record.foo.bars[1].value
     end
+
+    def test_has_key_is_available
+      str_key = "Bar"
+      sym_key = :sym_bar
+      record = Record.new({ str_key => "Baz", sym_key => "Foo"})
+
+      assert_respond_to record, :has_key?
+      assert record.has_key?(sym_key), "Record does not have symbol '#{sym_key}'."
+      assert record.has_key?(str_key), "Record does not have '#{str_key}'."
+
+    end
   end
 end
