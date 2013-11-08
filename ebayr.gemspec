@@ -18,7 +18,7 @@ command-line client which aids integration into other projects.
   gem.test_files    = gem.files.grep(%r{^test/})
   gem.name          = "ebayr"
   gem.require_paths = ["lib"]
-  gem.version       = "0.1.0"
+  gem.version       = "0.0.5"
   if RUBY_VERSION < "1.9"
     gem.add_dependency 'activesupport', '~> 3.2'
     gem.add_development_dependency 'minitest'
