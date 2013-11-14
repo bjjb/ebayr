@@ -12,6 +12,7 @@ Ruby. Includes a self-contained XML parser, a flexible callback system, and a
 command-line client which aids integration into other projects.
   DESCRIPTION
   gem.homepage      = "http://github.com/bjjb/ebayr"
+  gem.licence       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
