@@ -1,41 +1,212 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <title>eBayR by jjbuckley</title>
-  </head>
+  <title>eBayR</title>
+  <meta name="description" content="eBay Trading API? Arrrr, not so trixie.">
 
-  <body>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
+</head>
+
+<body>
+
+  <div class="wrapper">
     <header>
-      <div class="container">
-        <h1>eBayR</h1>
-        <h2>eBay Trading API? Arrrr, not so trixie.</h2>
-
-        <section id="downloads">
-          <a href="https://github.com/jjbuckley/ebayr/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/jjbuckley/ebayr/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/jjbuckley/ebayr" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
+      <h1 class="title">eBayR</h1>
     </header>
+    <div id="container">
+      <p class="tagline">eBay Trading API? Arrrr, not so trixie.</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/bjjb/ebayr/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/bjjb/ebayr/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/bjjb/ebayr" class="code">View eBayR on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>
+<a name="ebayr" class="anchor" href="#ebayr"><span class="octicon octicon-link"></span></a>Ebayr</h1>
 
-    <div class="container">
-      <section id="main_content">
-        <h3>eBayR</h3>
+<p>Ebayr is a small gem which makes it a little easier to use the eBay Trading API
+with Ruby.</p>
 
-<p>eBayR is a small library to help using the eBay Trading API with Ruby.</p>
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Have a look at the project page.</p>
-      </section>
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 'ebayr'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install ebayr
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>To use the eBay Trading API, you'll need a developer keyset. Sign up at
+<a href="http://developer.ebay.com">http://developer.ebay.com</a> if you haven't already done so.</p>
+
+<p>Next, you'll need to require Ebayr, and tell it to use your keys. You will also
+need to generate an RUName, and get the key for that. (This is all standard
+stuff - look at the <a href="http://developer.ebay.com">eBay developer docs</a> for details).</p>
+
+<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'ebayr'</span>
+
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">dev_id</span> <span class="o">=</span> <span class="s2">"my-dev-id"</span>
+
+<span class="c1"># This is only needed if you want to retrieve user tokens</span>
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">authorization_callback_url</span> <span class="o">=</span> <span class="s2">"https://my-site/callback-url"</span>
+
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="s2">"myverylongebayauthtoken"</span>
+
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">app_id</span> <span class="o">=</span> <span class="s2">"my-ebay-app-id"</span>
+
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">cert_id</span> <span class="o">=</span> <span class="s2">"my-ebay-cert-id"</span>
+
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">ru_name</span> <span class="o">=</span> <span class="s2">"my-ebay-ru-name"</span>
+
+<span class="c1"># Set this to true for testing in the eBay Sandbox (but remember to use the</span>
+<span class="c1"># appropriate keys!). It's true by default.</span>
+<span class="no">Ebayr</span><span class="o">.</span><span class="n">sandbox</span> <span class="o">=</span> <span class="kp">false</span>
+</pre></div>
+
+<p>Now you're ready to make calls</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">Ebayr</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="ss">:GeteBayOfficialTime</span><span class="p">)</span>
+<span class="n">session</span> <span class="o">=</span> <span class="no">Ebayr</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="ss">:GetSessionID</span><span class="p">,</span> <span class="ss">:RuName</span> <span class="o">=&gt;</span> <span class="no">Ebayr</span><span class="o">.</span><span class="n">ru_name</span><span class="p">)</span><span class="o">[</span><span class="ss">:SessionID</span><span class="o">]</span>
+</pre></div>
+
+<p>To use an authorized user's key, pass in an <code>auth_token</code> parameter</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">Ebayr</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="ss">:GetOrders</span><span class="p">,</span> <span class="ss">:auth_token</span> <span class="o">=&gt;</span> <span class="s2">"another-ebay-auth-token"</span><span class="p">)</span>
+</pre></div>
+
+<h3>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h3>
+
+<p>Ebayr will look for the following Ruby files, and load them <em>once</em> in order (if
+they exist) when the module is evaluated:</p>
+
+<ol>
+<li>/etc/ebayr.conf</li>
+<li>/usr/local/etc/ebayr.conf</li>
+<li>~/.ebayr.conf</li>
+<li>./.ebayr.conf</li>
+</ol><p>You can put configuration code in there (such as the variable setting shown
+above). The files should be plain old Ruby.</p>
+
+<p>In a Ruby on Rails project, just create a file called
+config/initializers/ebayr.rb (or something), and put the configuration there. Of
+course, you should probably not check in these files, if you're using a public
+repository.</p>
+
+<h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p><a href="https://travis-ci.org/bjjb/ebayr"><img src="https://travis-ci.org/bjjb/ebayr.png?branch=master" alt="Status"></a></p>
+
+<p>When running test, you generally won't want to use up your API call-limit too
+quickly, so it makes sense to stub out calls to the eBay API.</p>
+
+<p>Ebayr test use <a href="http://fakeweb.rubyforge.org">Fakeweb</a> to mimic the responses from eBay.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="nb">require</span> <span class="s1">'ebayr'</span>
+<span class="nb">require</span> <span class="s1">'test/unit'</span>
+<span class="nb">require</span> <span class="s1">'fakeweb'</span>
+
+<span class="k">class</span> <span class="nc">MyTest</span> <span class="o">&lt;</span> <span class="no">Test</span><span class="o">::</span><span class="no">Unit</span><span class="o">::</span><span class="no">TestCase</span>
+  <span class="k">def</span> <span class="nf">setup</span>
+    <span class="no">Ebayr</span><span class="o">.</span><span class="n">sandbox</span> <span class="o">=</span> <span class="kp">true</span>
+  <span class="k">end</span>
+
+  <span class="c1"># A very contrived example...</span>
+  <span class="k">def</span> <span class="nf">test_get_ebay_time</span>
+    <span class="n">xml</span> <span class="o">=</span> <span class="o">&lt;&lt;-</span><span class="no">XML</span>
+<span class="sh">      &lt;GeteBayOfficialTimeResponse&gt;</span>
+<span class="sh">        &lt;Ack&gt;Success&lt;/Ack&gt;</span>
+<span class="sh">        &lt;Timestamp&gt;blah&lt;/Timestamp&gt;</span>
+<span class="sh">      &lt;/GeteBayOfficialTimeResponse&gt;</span>
+<span class="no">    XML</span>
+
+    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:post</span><span class="p">,</span> <span class="no">Ebayr</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="n">xml</span><span class="p">)</span>
+
+    <span class="n">time</span> <span class="o">=</span> <span class="no">SomeWrapperThatUsesEbayr</span><span class="o">.</span><span class="n">get_ebay_time</span>
+    <span class="n">assert_equal</span> <span class="s1">'blah'</span><span class="p">,</span> <span class="n">time</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">SomeWrapperThatUsesEbayr</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">get_ebay_time</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="no">Ebayr</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="ss">:GeteBayOfficialTime</span><span class="p">)</span>
+    <span class="nb">hash</span><span class="o">.</span><span class="n">timestamp</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>See <a href="test/ebayr_test.rb">'./test/ebayr_test.rb'</a> for more examples.</p>
+
+<p>You need to remember to include Fakeweb in your Gemfile, or Ebayr will complain.</p>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Added some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+        </article>
+      </div>
     </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/bjjb" class="avatar"><img src="https://avatars2.githubusercontent.com/u/10744?s=60" width="48" height="48"/></a> <a href="https://github.com/bjjb">bjjb</a> maintains <a href="https://github.com/bjjb/ebayr">eBayR</a></p>
 
-    
-  </body>
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/bjjb/ebayr/tarball/master" class="tar">tar</a><a href="https://github.com/bjjb/ebayr/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-49952150-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+</body>
 </html>
