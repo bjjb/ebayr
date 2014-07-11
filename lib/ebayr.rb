@@ -75,7 +75,7 @@ module Ebayr
   mattr_accessor :logger
   self.logger = Logger.new(STDOUT)
   self.logger.level = Logger::INFO
-  
+
   mattr_accessor :debug
   self.debug = false
 
