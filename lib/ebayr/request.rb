@@ -57,6 +57,9 @@ module Ebayr #:nodoc:
       http = Net::HTTP.new(@uri.host, @uri.port)
       http.read_timeout = @http_timeout
 
+      # Output request XML if debug flag is set
+      puts body if self.debug == true
+
       if @uri.port == 443
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
