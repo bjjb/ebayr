@@ -58,7 +58,7 @@ module Ebayr #:nodoc:
       http.read_timeout = @http_timeout
 
       # Output request XML if debug flag is set
-      puts body if self.debug == true
+      puts body if debug == true
 
       if @uri.port == 443
         http.use_ssl = true
