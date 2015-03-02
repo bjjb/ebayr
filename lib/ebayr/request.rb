@@ -82,15 +82,27 @@ module Ebayr #:nodoc:
     #     Ebayr.xml("Hello!")       # => "Hello!"
     #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
     #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
-    def self.xml(*args)
-      args.map do |structure|
-        case structure
-          when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-          when Array then structure.map { |v| xml(v) }.join
-          else structure.to_s
+def self.xml(*args)
+  args.map do |structure|
+    case structure
+      when Hash then structure.map do |k, v|
+        # each sub value of array sent through xml method again
+        if v.is_a? Array
+          v.map do |sv|
+            xml(k => sv)
+          end.join
+        else
+          xml_element(k, v)
         end
       end.join
+      else structure.to_s
     end
+  end.join
+end
+
+def self.xml_element(k, v)
+  "<#{k.to_s}>#{xml(v)}</#{k.to_s}>"
+end
 
     # Prepares a hash of arguments for input to an eBay Trading API XML call.
     # * Times are converted to ISO 8601 format
