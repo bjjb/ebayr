@@ -17,7 +17,7 @@ module Ebayr #:nodoc:
       @compatability_level = (options.delete(:compatability_level) || self.compatability_level).to_s
       @http_timeout = (options.delete(:http_timeout) || 60).to_i
       # Remaining options are converted and used as input to the call
-      @input = self.class.serialize_input(options)
+      @input = options.delete(:input) || self.class.serialize_input(options)
     end
 
     # Gets the path to which this request will be posted
