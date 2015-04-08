@@ -19,6 +19,10 @@ module Ebayr #:nodoc:
       # Remaining options are converted and used as input to the call
       @input = options.delete(:input) || self.class.serialize_input(options)
     end
+    
+    def input_xml
+      self.class.xml(@input)
+    end
 
     # Gets the path to which this request will be posted
     def path
@@ -46,7 +50,7 @@ module Ebayr #:nodoc:
           <RequesterCredentials>
             <eBayAuthToken>#{@auth_token}</eBayAuthToken>
           </RequesterCredentials>
-          #{self.class.xml(@input)}
+          #{input_xml}
         </#{@command}Request>
       XML
     end
