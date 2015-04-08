@@ -17,7 +17,7 @@ module Ebayr #:nodoc:
       @compatability_level = (options.delete(:compatability_level) || self.compatability_level).to_s
       @http_timeout = (options.delete(:http_timeout) || 60).to_i
       # Remaining options are converted and used as input to the call
-      @input = options.delete(:input) || self.class.serialize_input(options)
+      @input = options.delete(:input) || options
     end
     
     def input_xml
@@ -91,22 +91,18 @@ module Ebayr #:nodoc:
         case structure
           when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
           when Array then structure.map { |v| xml(v) }.join
-          else structure.to_s
+          else self.serialize_input(structure).to_s
         end
       end.join
     end
 
-    # Prepares a hash of arguments for input to an eBay Trading API XML call.
+    # Prepares an argument for input to an eBay Trading API XML call.
     # * Times are converted to ISO 8601 format
-    def self.serialize_input(args)
-      result = {}
-      args.each do |k, v|
-        result[k] = case v
-          when Time then v.to_time.utc.iso8601
-          else v
-        end
+    def self.serialize_input(input)
+       case input
+         when Time then input.to_time.utc.iso8601
+         else input
       end
-      result
     end
 
     # Converts a command like get_ebay_offical_time to GeteBayOfficialTime
