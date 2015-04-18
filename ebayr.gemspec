@@ -27,6 +27,6 @@ command-line client which aids integration into other projects.
   else
     gem.add_dependency 'activesupport', '~> 4.0'
   end
-  gem.add_development_dependency 'rake' '~> 10.4.1'
+  gem.add_development_dependency 'rake'
   gem.add_development_dependency 'fakeweb'
 end
