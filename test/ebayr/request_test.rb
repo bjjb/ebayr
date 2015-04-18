@@ -20,7 +20,7 @@ describe Ebayr::Request do
   describe "arrays" do
     it "converts multiple arguments in new function" do
       args = [{ :a => 1 }, { :a => [{:b => 1 }, { :b => 2 }] }]
-      Ebayr::Request.new(:Blah, input: args).input_xml.must_equal '<a>1</a><a><b>1</b><b>2</b></a>'
+      Ebayr::Request.new(:Blah, :input => args).input_xml.must_equal '<a>1</a><a><b>1</b><b>2</b></a>'
     end
 
     it "converts times" do
