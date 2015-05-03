@@ -21,6 +21,7 @@ command-line client which aids integration into other projects.
   gem.require_paths = ["lib"]
   gem.version       = "0.0.6"
   if RUBY_VERSION < "1.9"
+    gem.add_dependency 'i18n', '~> 0.6.11'
     gem.add_dependency 'activesupport', '~> 3.2'
     gem.add_development_dependency 'minitest'
   else
