@@ -58,6 +58,12 @@ To use an authorized user's key, pass in an `auth_token` parameter
 Ebayr.call(:GetOrders, :auth_token => "another-ebay-auth-token")
 ```
 
+Use the input array to add to the body of the call
+```ruby
+# Adds: "<a>1</a><a><b>1</b><b>2</b></a>" to the ebay request.
+args = [{ :a => 1 }, { :a => [{:b => 1 }, { :b => 2 }] }]
+Ebayr::Request.new(:Blah, :input => args)
+```
 
 ### Configuration
 
