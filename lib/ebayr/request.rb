@@ -47,11 +47,20 @@ module Ebayr #:nodoc:
       <<-XML
         <?xml version="1.0" encoding="utf-8"?>
         <#{@command}Request xmlns="urn:ebay:apis:eBLBaseComponents">
-          <RequesterCredentials>
-            <eBayAuthToken>#{@auth_token}</eBayAuthToken>
-          </RequesterCredentials>
+          #{requester_credentials_xml}
           #{input_xml}
         </#{@command}Request>
+      XML
+    end
+
+    # Returns eBay requester credential XML if @auth_token is present
+    def requester_credentials_xml
+      return "" unless @auth_token && !@auth_token.empty?
+
+      <<-XML
+      <RequesterCredentials>
+        <eBayAuthToken>#{@auth_token}</eBayAuthToken>
+      </RequesterCredentials>
       XML
     end
 
