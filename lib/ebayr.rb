@@ -27,6 +27,13 @@ module Ebayr
   mattr_accessor :sandbox
   self.sandbox = true
 
+  mattr_accessor :use_old_hash_to_xml_conversion
+  self.use_old_hash_to_xml_conversion = false
+
+  def use_old_hash_to_xml_conversion?
+    !!use_old_hash_to_xml_conversion
+  end
+
   # Set to true to generate fancier objects for responses (will decrease
   # performance).
   mattr_accessor :normalize_responses
