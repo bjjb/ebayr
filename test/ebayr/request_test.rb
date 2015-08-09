@@ -55,5 +55,21 @@ describe Ebayr::Request do
       args = [{ :a => 1 }, { :a => [{:b => 1 }, { :b => 2 }] }]
       request(*args).must_equal '<a>1</a><a><b>1</b><b>2</b></a>'
     end
+
+    describe "requester credentials" do
+      it 'includes requester credentials when auth_token present' do
+        my_token = "auth-token-123xyz"
+        request = Ebayr::Request.new(:Blah, :auth_token => my_token)
+        request.body.must_include "<RequesterCredentials>", "</RequesterCredentials>"
+        request.body.must_include "<eBayAuthToken>#{my_token}</eBayAuthToken>"
+      end
+
+      it 'excludes requester credentials when auth_token not present' do
+        request = Ebayr::Request.new(:Blah, :auth_token => nil)
+        request.body.wont_include "<RequesterCredentials>", "</RequesterCredentials>"
+        request.body.wont_include "<eBayAuthToken>", "</eBayAuthToken>"
+      end
+    end
   end
+
 end
