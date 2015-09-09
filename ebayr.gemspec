@@ -21,10 +21,12 @@ command-line client which aids integration into other projects.
   gem.require_paths = ["lib"]
   gem.version       = "0.0.9"
   if RUBY_VERSION < "1.9"
+    gem.add_dependency 'nokogiri', '~> 1.5.0'
     gem.add_dependency 'i18n', '~> 0.6.11'
     gem.add_dependency 'activesupport', '~> 3.2'
     gem.add_development_dependency 'minitest'
   else
+    gem.add_dependency 'nokogiri', '~> 1.6'
     gem.add_dependency 'activesupport', '~> 4.0'
   end
   gem.add_development_dependency 'rake'
