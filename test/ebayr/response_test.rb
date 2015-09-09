@@ -2,7 +2,6 @@
 require 'test_helper'
 require 'ostruct'
 require 'ebayr/response'
-
 describe Ebayr::Response do
   it "builds objects from XML" do
     xml = "<GetSomethingResponse><Foo>Bar</Foo></GetSomethingResponse>"
@@ -12,7 +11,6 @@ describe Ebayr::Response do
     response['Foo'].must_equal 'Bar'
     response.foo.must_equal 'Bar'
   end
-
   it "handes responses" do
     xml = "<GeteBayResponse><eBayFoo>Bar</eBayFoo></GeteBayResponse>"
     response = Ebayr::Response.new(
@@ -20,7 +18,13 @@ describe Ebayr::Response do
       OpenStruct.new(:body => xml))
     response.ebay_foo.must_equal 'Bar'
   end
-
+  it "handles responses with many html entities" do
+    xml = "<GeteBayResponse><eBayFoo>Bar</eBayFoo><Description>#{'&lt;p class="p1"&gt;&lt;span class="s1"&gt;&lt;br&gt;&lt;/span&gt;&lt;/p&gt;' * 5000}</Description></GeteBayResponse>"
+    response = Ebayr::Response.new(
+        OpenStruct.new(:command => 'GeteBay'),
+        OpenStruct.new(:body => xml))
+    response.ebay_foo.must_equal 'Bar'
+  end
   def test_response_nesting
     xml = <<-XML
       <GetOrdersResponse>
@@ -46,5 +50,4 @@ describe Ebayr::Response do
     response.orders_array.order[1].order_id.must_equal "2"
     response.orders_array.order[2].order_id.must_equal "3"
   end
-
 end
