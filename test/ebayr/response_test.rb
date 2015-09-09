@@ -19,7 +19,7 @@ describe Ebayr::Response do
     response.ebay_foo.must_equal 'Bar'
   end
   it "handles responses with many html entities" do
-    xml = "<GeteBayResponse><eBayFoo>Bar</eBayFoo><Description>#{'&lt;p class="p1"&gt;&lt;span class="s1"&gt;&lt;br&gt;&lt;/span&gt;&lt;/p&gt;' * 5000}</Description></GeteBayResponse>"
+    xml = "<GeteBayResponse><eBayFoo>Bar</eBayFoo><Description>#{'<p class="p1"><span class="s1"><br/></span></p>' * 5000}</Description></GeteBayResponse>"
     response = Ebayr::Response.new(
         OpenStruct.new(:command => 'GeteBay'),
         OpenStruct.new(:body => xml))

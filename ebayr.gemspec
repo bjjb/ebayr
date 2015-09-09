@@ -19,7 +19,7 @@ command-line client which aids integration into other projects.
   gem.test_files    = gem.files.grep(%r{^test/})
   gem.name          = "ebayr"
   gem.require_paths = ["lib"]
-  gem.version       = "0.0.9"
+  gem.version       = "0.0.10"
   if RUBY_VERSION < "1.9"
     gem.add_dependency 'nokogiri', '~> 1.5.0'
     gem.add_dependency 'i18n', '~> 0.6.11'
