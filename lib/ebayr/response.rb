@@ -4,7 +4,6 @@ module Ebayr #:nodoc:
   class Response < Record
     def initialize(request, response)
       ActiveSupport::XmlMini.backend = 'Nokogiri'
-
       @request = request
       @command = @request.command if @request
       @response = response

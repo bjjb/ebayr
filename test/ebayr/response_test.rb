@@ -25,6 +25,14 @@ describe Ebayr::Response do
         OpenStruct.new(:body => xml))
     response.ebay_foo.must_equal 'Bar'
   end
+  it "can report its attributes" do
+    xml = "<GeteBayResponse><eBayFoo foo='Foo' bar='Bar'>Hullo</eBayFoo></GeteBayResponse>"
+    response = Ebayr::Response.new(
+        OpenStruct.new(:command => 'GeteBay'),
+        OpenStruct.new(:body => xml))
+    response.ebay_foo.attributes[:foo].must_equal 'Foo'
+    response.ebay_foo.attributes[:bar].must_equal 'Bar'
+  end
   def test_response_nesting
     xml = <<-XML
       <GetOrdersResponse>
