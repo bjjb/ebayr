@@ -58,11 +58,29 @@ To use an authorized user's key, pass in an `auth_token` parameter
 Ebayr.call(:GetOrders, :auth_token => "another-ebay-auth-token")
 ```
 
-Use the input array to add to the body of the call
+Use the input option to add to the body of the call:
 ```ruby
-# Adds: "<a>1</a><a><b>1</b><b>2</b></a>" to the ebay request.
+# Adds "<a>1</a>" to the ebay request body
+Ebayr::Request.new(:Blah, input: {a: 1})
+```
+
+Values to the `input` key can be Hashes again, which are resolved to their corresponding XML representation. Please note, that if a value in this Hash is an Array, then each of the Array's elements is wrapped in the same tag (which is the value's key), like here (1 and 2 are both wrapped in the tag `b`):
+```ruby
+# Adds: "<a>1</a><a><b>1</b><b>2</b></a>" to the ebay request body
+args = {a: [ 1, { b: [1, 2] } ]}
+Ebayr::Request.new(:Blah, :input => args)
+```
+
+However, please note, that up to version 0.0.10 Arrays in Hash values were handled differently:
+```ruby
+# Up to version 0.0.10:
+# Adds: "<a>1</a><a><b>1</b><b>2</b></a>" to the ebay request body
 args = [{ :a => 1 }, { :a => [{:b => 1 }, { :b => 2 }] }]
 Ebayr::Request.new(:Blah, :input => args)
+```
+That is: Arrays used to have every element converted to XML, and then `join`ed. Please, use the new compact syntax; however, if you have to, you can switch the legacy syntax on with this setting:
+```ruby
+Ebayr.use_old_hash_to_xml_conversion = true
 ```
 
 ### Configuration
