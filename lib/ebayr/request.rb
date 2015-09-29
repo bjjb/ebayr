@@ -9,7 +9,7 @@ module Ebayr #:nodoc:
     # Make a new call. The URI used will be that of Ebayr::uri, unless
     # overridden here (same for auth_token, site_id and compatability_level).
     def initialize(command, options = {})
-      @command = self.class.camelize(command.to_s)
+      @command = camelize(command.to_s)
       @uri = options.delete(:uri) || self.uri
       @uri = URI.parse(@uri) unless @uri.is_a? URI
       @auth_token = (options.delete(:auth_token) || self.auth_token).to_s
@@ -18,10 +18,6 @@ module Ebayr #:nodoc:
       @http_timeout = (options.delete(:http_timeout) || 60).to_i
       # Remaining options are converted and used as input to the call
       @input = options.delete(:input) || options
-    end
-
-    def input_xml
-      self.class.xml(@input)
     end
 
     # Gets the path to which this request will be posted
@@ -90,14 +86,20 @@ module Ebayr #:nodoc:
       "#{@command}[#{@input}] <#{@uri}>"
     end
 
+    private
+
+    def input_xml
+      xml @input
+    end
+
     # A very, very simple XML serializer.
     #
     #     Ebayr.xml("Hello!")       # => "Hello!"
     #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
     #     Ebayr.xml([{:foo=>"Bar"}])  # => <foo>Bar</foo>
     #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo><foo>Baz</foo>
-    def self.xml(*args)
-      return old_xml(*args) if Ebayr.use_old_hash_to_xml_conversion?
+    def xml(*args)
+      return xml_with_old_conversion(*args) if Ebayr.use_old_hash_to_xml_conversion?
 
       args = args.flatten
       args.map do |structure|
@@ -111,41 +113,37 @@ module Ebayr #:nodoc:
             end
           end
         else
-          self.serialize_input(structure).to_s
+          serialize(structure)
         end
       end.join
     end
 
-    class << self
-      private
-
-      # A very, very simple XML serializer.
-      #
-      #     Ebayr.xml("Hello!")       # => "Hello!"
-      #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
-      #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
-      def old_xml(*args)
-        args.map do |structure|
-          case structure
-            when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-            when Array then structure.map { |v| xml(v) }.join
-            else self.serialize_input(structure).to_s
-          end
-        end.join
-      end
+    # A very, very simple XML serializer.
+    #
+    #     Ebayr.xml("Hello!")       # => "Hello!"
+    #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
+    #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
+    def xml_with_old_conversion(*args)
+      args.map do |structure|
+        case structure
+        when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
+        when Array then structure.map { |v| xml(v) }.join
+        else serialize(structure)
+        end
+      end.join
     end
 
     # Prepares an argument for input to an eBay Trading API XML call.
     # * Times are converted to ISO 8601 format
-    def self.serialize_input(input)
-       case input
-         when Time then input.to_time.utc.iso8601
-         else input
+    def serialize(input)
+      case input
+        when Time then input.to_time.utc.iso8601
+        else input.to_s
       end
     end
 
     # Converts a command like get_ebay_offical_time to GeteBayOfficialTime
-    def self.camelize(string)
+    def camelize(string)
       string = string.to_s
       return string unless string == string.downcase
       string.split('_').map(&:capitalize).join.gsub('Ebay', 'eBay')
