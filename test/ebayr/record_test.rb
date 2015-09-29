@@ -3,7 +3,7 @@ require 'test_helper'
 require 'ebayr/record'
 
 module Ebayr
-  class RecordTest < MiniTest::Unit::TestCase
+  class RecordTest < Minitest::Test
     def test_lookup_is_case_insensitive
       record = Record.new('Foo' => 'Bar')
       assert_equal 'Bar', record['Foo']
