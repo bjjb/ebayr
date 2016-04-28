@@ -98,7 +98,17 @@ module Ebayr #:nodoc:
     def self.xml(*args)
       args.map do |structure|
         case structure
-          when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
+          when Hash then structure.map { |k ,v|
+            str = ''
+            if v.class == Array
+              v.each do |item|
+                str += "<#{k.to_s}>#{xml(item)}</#{k.to_s}>"
+              end
+            else
+              str "<#{k.to_s}>#{xml(v)}</#{k.to_s}>"
+            end
+            str
+          }.join
           when Array then structure.map { |v| xml(v) }.join
           else self.serialize_input(structure).to_s
         end
