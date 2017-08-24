@@ -5,9 +5,9 @@ module Ebayr
 
     def self.included(mod)
       begin
-        require 'fakeweb' unless const_defined?(:FakeWeb)
+        require 'webmock' unless const_defined?(:WebMock)
       rescue LoadError
-        throw "Couldn't load fakeweb! Is it in your Gemfile?"
+        throw "Couldn't load webmock! Is it in your Gemfile?"
       end
     end
 
@@ -26,18 +26,18 @@ stub_ebay_call! is deprecated, and will be removed in a future release. Please
 use Ruby techniques to stub eBay calls your way. See the wiki for details.
 DEPRECATION
       content = Ebayr.xml(content) unless content.is_a?(String)
-      _allow_net_connect_ = FakeWeb.allow_net_connect?
-      FakeWeb.allow_net_connect = false
+      net_connect_allowed = WebMock.net_connect_allowed?
+      WebMock.disable_net_connect!
       body = <<-XML
         <#{call}Response>
           #{Ebayr.xml(:Ack => "Success")}
           #{content}
         </#{call}Response>
       XML
-      FakeWeb.register_uri(:any, Ebayr.uri, :body => body)
+      stub = WebMock.stub_request(:any, Ebayr.uri).to_return(:body => body)
       yield
-      FakeWeb.clean_registry
-      FakeWeb.allow_net_connect = _allow_net_connect_
+      WebMock.remove_request_stub stub
+      WebMock.allow_net_connect! if net_connect_allowed
     end
   end
 end

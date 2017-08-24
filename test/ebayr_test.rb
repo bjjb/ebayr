@@ -1,7 +1,9 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
 require 'ebayr'
-require 'fakeweb'
+require 'webmock'
+
+WebMock.enable!
 
 describe Ebayr do
   before { Ebayr.sandbox = true }
@@ -35,7 +37,7 @@ describe Ebayr do
 
   # If this passes without an exception, then we're ok.
   describe "basic usage" do
-    before { FakeWeb.register_uri(:post, Ebayr.uri, :body => xml) }
+    before { WebMock.stub_request(:post, Ebayr.uri).to_return(:body => xml) }
     let(:xml) { "<GeteBayOfficialTimeResponse><Ack>Succes</Ack><Timestamp>blah</Timestamp></GeteBayOfficialTimeResponse>" }
 
     it "runs without exceptions" do
