@@ -22,6 +22,6 @@ command-line client which aids integration into other projects.
   gem.version       = "0.0.10"
   gem.add_dependency 'nokogiri', '~> 1.6'
   gem.add_dependency 'activesupport', '~> 4.0'
-  gem.add_development_dependency 'rake', '~> 11'
-  gem.add_development_dependency 'fakeweb'
+  gem.add_development_dependency 'rake', '~> 12.0'
+  gem.add_development_dependency 'fakeweb', '~> 1.3.0'
 end
