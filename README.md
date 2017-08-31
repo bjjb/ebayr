@@ -138,5 +138,15 @@ You need to remember to include Fakeweb in your Gemfile, or Ebayr will complain.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+## Credits
+
+Thanks to the great contributing maintainers on GitHub, including:
+- David DeGraw
+- Eric McKenna
+- Jason Schock
+- Laurent Arnoud
+- SpeerJ
+- jogaco
+
 [1]: http://developer.ebay.com
 [2]: http://fakeweb.rubyforge.org

@@ -3,7 +3,7 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ['JJ Buckley', 'Eric McKenna']
+  gem.authors       = ['JJ Buckley']
   gem.email         = ["jj@bjjb.org"]
   gem.summary       = "A tidy library for using the eBay Trading API with Ruby"
   gem.description   = <<-DESCRIPTION
