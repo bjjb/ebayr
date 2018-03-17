@@ -19,7 +19,7 @@ module Ebayr #:nodoc:
       # Remaining options are converted and used as input to the call
       @input = options.delete(:input) || options
     end
-    
+
     def input_xml
       self.class.xml(@input)
     end
@@ -81,7 +81,7 @@ module Ebayr #:nodoc:
       post = Net::HTTP::Post.new(@uri.path, headers)
       post.body = body
 
-      response = http.start { |h| h.request(post) }
+      response = http.start { |conn| conn.request(post) }
 
       @response = Response.new(self, response)
     end
@@ -98,11 +98,29 @@ module Ebayr #:nodoc:
     def self.xml(*args)
       args.map do |structure|
         case structure
-          when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
+          when Hash then serialize_hash(structure)
           when Array then structure.map { |v| xml(v) }.join
           else self.serialize_input(structure).to_s
         end
       end.join
+    end
+
+    def self.serialize_hash(hash)
+      hash.map do |k, v|
+        if v.kind_of?(Hash) && v.key?(:value) && v.key?(:attr)
+          serialize_hash_with_attr(k, v)
+        else
+          "<#{k.to_s}>#{xml(v)}</#{k.to_s}>"
+        end
+      end.join
+    end
+
+    # Converts a hash with attributes to a tag
+    # {:foo=>{:value=>"Bar", :attr=>{:name=>"baz"}}}
+    # gives <foo name="baz">Bar</foo>
+    def self.serialize_hash_with_attr(key, value)
+      attr = value[:attr].map { |k_attr, v_attr| "#{k_attr}=\"#{v_attr}\"" }.join
+      "<#{key.to_s} #{attr}>#{xml(value[:value])}</#{key.to_s}>"
     end
 
     # Prepares an argument for input to an eBay Trading API XML call.

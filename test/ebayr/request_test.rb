@@ -39,6 +39,11 @@ describe Ebayr::Request do
       request(:a => { :b => 123 }).must_equal '<a><b>123</b></a>'
     end
 
+    it "converts a hash with attributes" do
+      hash = { :b => { :value => 123, :attr => { :name => 'c' } } }
+      request(hash).must_equal '<b name="c">123</b>'
+    end
+
     it "converts an array" do
       request([{ :a => 1 }, { :a => 2 }]).must_equal "<a>1</a><a>2</a>"
     end
