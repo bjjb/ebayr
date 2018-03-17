@@ -17,9 +17,9 @@ Or install it yourself as:
 
     $ gem install ebayr
 
-## Ruby < 1.9
+## Ruby versions pre-2.2
 
-Older versions of ruby are no longer supported as of v0.0.10. To use ebayr
+Older versions of ruby are no longer supported as of v0.1.0. To use ebayr
 with Ruby 1.8, try version v0.0.9.
 
     $ gem install ebayr -v '=0.0.9'
@@ -28,6 +28,13 @@ You may need to install an earlier version of activesupport in order to make
 this work (since the dependency i18n does not support 1.8 after version
 0.6.11). Your mileage may vary, and you probably should update your Ruby
 version anyway.
+
+If you would like to use anthing pre Ruby 2.2, then, you can try any of the
+releases from the v0.0 branch; the latest is v0.0.11
+
+    $ gem install ebayr -v '=0.0.11'
+
+Again, YMMV, and the same advice applies.
 
 ## Usage
 
