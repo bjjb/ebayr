@@ -3,6 +3,10 @@ require 'test_helper'
 require 'ebayr'
 require 'fakeweb'
 
+class FakeWeb::StubSocket
+  def close; end
+end
+
 describe Ebayr do
   before { Ebayr.sandbox = true }
 

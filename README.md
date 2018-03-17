@@ -17,6 +17,18 @@ Or install it yourself as:
 
     $ gem install ebayr
 
+## Ruby < 1.9
+
+Older versions of ruby are no longer supported as of v0.0.10. To use ebayr
+with Ruby 1.8, try version v0.0.9.
+
+    $ gem install ebayr -v '=0.0.9'
+
+You may need to install an earlier version of activesupport in order to make
+this work (since the dependency i18n does not support 1.8 after version
+0.6.11). Your mileage may vary, and you probably should update your Ruby
+version anyway.
+
 ## Usage
 
 To use the eBay Trading API, you'll need a developer keyset. Sign up at
@@ -137,6 +149,16 @@ You need to remember to include Fakeweb in your Gemfile, or Ebayr will complain.
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Credits
+
+Thanks to the great contributing maintainers on GitHub, including:
+- David DeGraw
+- Eric McKenna
+- Jason Schock
+- Laurent Arnoud
+- SpeerJ
+- jogaco
 
 [1]: http://developer.ebay.com
 [2]: http://fakeweb.rubyforge.org

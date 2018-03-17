@@ -81,7 +81,7 @@ module Ebayr #:nodoc:
       post = Net::HTTP::Post.new(@uri.path, headers)
       post.body = body
 
-      response = http.start { |http| http.request(post) }
+      response = http.start { |h| h.request(post) }
 
       @response = Response.new(self, response)
     end
@@ -108,9 +108,9 @@ module Ebayr #:nodoc:
     # Prepares an argument for input to an eBay Trading API XML call.
     # * Times are converted to ISO 8601 format
     def self.serialize_input(input)
-       case input
-         when Time then input.to_time.utc.iso8601
-         else input
+      case input
+        when Time then input.to_time.utc.iso8601
+        else input
       end
     end
 
