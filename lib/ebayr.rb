@@ -142,6 +142,6 @@ end
 
 # Override defaults with values from a config file, if there is one.
 %W(/etc/ebayr.conf /usr/local/etc/ebayr.conf ~/.ebayr.conf ./.ebayr.conf).each do |path|
-  load path if File.exists?(path = File.expand_path(path))
+  load path if File.exist?(path = File.expand_path(path))
 end
 
